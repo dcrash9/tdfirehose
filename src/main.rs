@@ -4,6 +4,7 @@ use chrono::{NaiveDate};
 use futures_util::{StreamExt, SinkExt};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message as WebSocketMessage};
 use url::Url;
+use clap::{App, Arg};
 
 
 fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -104,10 +105,25 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let matches = App::new("tdfirehose")
+        .version("0.1.0")
+        .about("A cross platform options data client.")
+        .arg(
+            Arg::new("ws_url")
+                .short('u')
+                .long("url")
+                .value_name("URL")
+                .takes_value(true),
+        )
+        .get_matches();
+    
+    let ws_url = matches.value_of("ws_url").unwrap_or("ws://127.0.0.1:25520/v1/events");
     // let url = Url::parse("ws://10.0.0.5:8080/v1/events")?;
-    let url = Url::parse("ws://127.0.0.1:25520/v1/events")?;
+    // let url = Url::parse("ws://127.0.0.1:25520/v1/events")?;
+    
+    let url = Url::parse(ws_url)?;
     let (ws_stream, _) = connect_async(url).await?;
-    println!("Connected to: ws://127.0.0.1:25520/v1/events");
+    println!("Connected to: {}", ws_url);
     let (mut write, mut read) = ws_stream.split();
 
     let subscribe_msg = WebSocketMessage::Text(r#"{

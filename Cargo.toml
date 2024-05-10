@@ -15,11 +15,12 @@ categories = ["command-line-utilities"]
 opt-level = 3  # Level of optimizations, can be 0-3 or 's'/'z'
 debug = false  # Include debug information, true or false
 lto = true     # Enables Link Time Optimization for further optimizations
-strip = 'all'  # Strip symbols from the binary, can be 'all' or 'debuginfo'
+#strip = 'symbols'  # Strip symbols from the binary, can be 'all' or 'debuginfo'
 
 
 [dependencies]
 chrono = "*"
+clap = "*"
 config = "*"
 csv = "*"
 futures-util = "*"

@@ -24,8 +24,28 @@ or to install:
 cargo install tdfirehose
 ```
 
+Command line options:
+```
+❯ ./tdfirehose -h
+tdfirehose 0.1.0
+A cross platform options data client.
+
+USAGE:
+tdfirehose [OPTIONS]
+
+OPTIONS:
+-h, --help         Print help information
+-u, --url <URL>
+-V, --version      Print version information
+```
+
+the default url is `ws://127.0.0.1:25520/v1/events`. you can change it at start like this:
+```
+./tdfirehose -u ws://10.0.0.5:8080/v1/events
+```
+
 ## Exit
-To exit just press `ESC` or `Ctrl + C`
+To exit just press `Ctrl + C`
 
 <hr>
 
