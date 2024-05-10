@@ -1,0 +1,12 @@
+[settings]
+ws_url = "ws://10.0.0.5:8080/v1/events"
+#ws_url = "ws://127.0.0.1:25520/v1/events"
+
+[prod]
+ws_url = "ws://10.0.0.5:8080/v1/events"
+
+[stage]
+ws_url = "ws://127.0.0.1:25520/v1/events"
+
+[dev]
+ws_url = "ws://127.0.0.1:25520/v1/events"

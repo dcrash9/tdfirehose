@@ -2,6 +2,13 @@
 name = "tdfirehose"
 version = "0.1.0"
 edition = "2021"
+authors = ["dcrash9 <https://github.com/dcrash9>"]
+description = "A cross platform options data client."
+readme = "README.md"
+repository = "https://github.com/dcrash9/tdfirehose"
+license-file = "LICENSE"
+keywords = ["thetadata", "options", "marketdata", "trading", "websockets"]
+categories = ["command-line-utilities"]
 
 
 [profile.release]
