@@ -1,0 +1,6 @@
+/target
+/_backup
+/ohlc.csv
+/quote.csv
+/trade.csv
+/.idea

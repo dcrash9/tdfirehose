@@ -1,0 +1,26 @@
+[package]
+name = "tdfirehose"
+version = "0.1.0"
+edition = "2021"
+
+
+[profile.release]
+opt-level = 3  # Level of optimizations, can be 0-3 or 's'/'z'
+debug = false  # Include debug information, true or false
+lto = true     # Enables Link Time Optimization for further optimizations
+strip = 'all'  # Strip symbols from the binary, can be 'all' or 'debuginfo'
+
+
+[dependencies]
+chrono = "*"
+config = "*"
+csv = "*"
+futures-util = "*"
+serde = { version = "*", features = ["derive"] }
+serde_derive = "*"
+serde_json = "*"
+time = { version = "*", features = ["serde"] } # Ensure to enable features you need, like serde for serialization.
+tokio = { version = "*", features = ["full"] }
+tokio-tungstenite = "*"
+toml = "*"
+url = "*"
