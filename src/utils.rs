@@ -47,6 +47,17 @@ pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv:
 }
 
 
+pub fn to_occ_contract(root: &String, expiration: i32, right: &String, strike: i64) -> Result<String, Box<dyn std::error::Error>> {
+    let occ_strike = format!("{:08}", strike);
+    let exp_date = NaiveDate::parse_from_str(&expiration.to_string(), "%Y%m%d")?;
+    let year2digits = exp_date.format("%y");
+    let month = exp_date.format("%m");
+    let day = exp_date.format("%d");
+    let symbol = format!("{}{}{}{}{}{}", root, year2digits, month, day, right, occ_strike);
+    Ok(symbol)
+}
+
+
 // pub fn is_third_friday(date:i32) -> bool {
 //     let expdate = NaiveDate::parse_from_str(&date.to_string(), "%Y%m%d");
 //     // Check if the day of the week is Friday
