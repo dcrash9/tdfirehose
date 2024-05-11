@@ -19,6 +19,7 @@ lto = true     # Enables Link Time Optimization for further optimizations
 
 
 [dependencies]
+memmap2 = "0.1.0"
 chrono = "*"
 clap = "3.2.25"
 config = "*"

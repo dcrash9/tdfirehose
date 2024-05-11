@@ -1,13 +1,24 @@
 mod enums;
 mod utils;
+
 use crate::utils::to_occ_contract;
 use chrono::NaiveDate;
 use clap::{Arg, Command};
 use futures_util::{SinkExt, StreamExt};
+use std::collections::VecDeque;
+use std::sync::{Arc, Mutex};
 use tokio_tungstenite::{connect_async, tungstenite::protocol::Message as WebSocketMessage};
 use url::Url;
 
-fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
+const BUFFER_SIZE: usize = 100;
+
+
+fn handle_message(
+    message: &str,
+    trade_buffer: &Arc<Mutex<VecDeque<enums::TradeData>>>,
+    quote_buffer: &Arc<Mutex<VecDeque<enums::QuoteData>>>,
+    ohlc_buffer: &Arc<Mutex<VecDeque<enums::OhlcData>>>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let msg: enums::AppMessage = serde_json::from_str(message)?;
 
     match msg.header.r#type.as_str() {
@@ -31,7 +42,6 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
                 )
                 .unwrap()
                 .to_string();
-
                 let quote_data = enums::QuoteData {
                     timestamp: datetime.format("%Y-%m-%d %H:%M:%S%.3f").to_string(),
                     // security_type: contract.security_type,
@@ -52,7 +62,14 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
                     ms_of_day: quote.ms_of_day,
                     date: quote.date,
                 };
-                utils::write_to_csv("quote.csv", quote_data)?;
+
+                let mut quote_buffer = quote_buffer.lock().unwrap();
+                quote_buffer.push_back(quote_data);
+
+                if quote_buffer.len() > BUFFER_SIZE {
+                    let quote_data = quote_buffer.pop_front().unwrap();
+                    utils::write_to_csv("quote.csv", quote_data)?;
+                }
             }
         }
         "TRADE" => {
@@ -92,7 +109,14 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
                     ms_of_day: trade.ms_of_day,
                     date: trade.date,
                 };
-                utils::write_to_csv("trade.csv", trade_data)?;
+
+                let mut trade_buffer = trade_buffer.lock().unwrap();
+                trade_buffer.push_back(trade_data);
+
+                if trade_buffer.len() > BUFFER_SIZE {
+                    let trade_data = trade_buffer.pop_front().unwrap();
+                    utils::write_to_csv("trade.csv", trade_data)?;
+                }
             }
         }
         "OHLC" => {
@@ -133,7 +157,14 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
                     ms_of_day: ohlc.ms_of_day,
                     date: ohlc.date,
                 };
-                utils::write_to_csv("ohlc.csv", ohlc_data)?;
+
+                let mut ohlc_buffer = ohlc_buffer.lock().unwrap();
+                ohlc_buffer.push_back(ohlc_data);
+
+                if ohlc_buffer.len() > BUFFER_SIZE {
+                    let ohlc_data = ohlc_buffer.pop_front().unwrap();
+                    utils::write_to_csv("ohlc.csv", ohlc_data)?;
+                }
             }
         }
         _ => (),
@@ -144,6 +175,13 @@ fn handle_message(message: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create buffers to store messages
+    let trade_buffer: Arc<Mutex<VecDeque<enums::TradeData>>> =
+        Arc::new(Mutex::new(VecDeque::new()));
+    let quote_buffer: Arc<Mutex<VecDeque<enums::QuoteData>>> =
+        Arc::new(Mutex::new(VecDeque::new()));
+    let ohlc_buffer: Arc<Mutex<VecDeque<enums::OhlcData>>> = Arc::new(Mutex::new(VecDeque::new()));
+
     let matches = Command::new("tdfirehose")
         .version("0.1.0")
         .about("A cross platform options data client.")
@@ -163,32 +201,59 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let url = Url::parse("ws://127.0.0.1:25520/v1/events")?;
 
     let url = Url::parse(ws_url)?;
-    let (ws_stream, _) = connect_async(url).await?;
-    println!("Connected to: {}", ws_url);
-    let (mut write, mut read) = ws_stream.split();
 
-    let subscribe_msg = WebSocketMessage::Text(
-        r#"{
-        "msg_type": "STREAM_BULK",
-        "sec_type": "OPTION",
-        "req_type": "TRADE",
-        "add": true,
-        "id": 0
-    }"#
-        .to_string(),
-    );
+    loop {
+        match connect_async(url.clone()).await {
+            Ok((ws_stream, _)) => {
+                println!("Connected to: {}", ws_url);
+                let (mut write, mut read) = ws_stream.split();
 
-    write.send(subscribe_msg).await?;
+                let subscribe_msg = WebSocketMessage::Text(
+                    r#"{
+                    "msg_type": "STREAM_BULK",
+                    "sec_type": "OPTION",
+                    "req_type": "TRADE",
+                    "add": true,
+                    "id": 0
+                }"#
+                    .to_string(),
+                );
 
-    while let Some(message) = read.next().await {
-        match message? {
-            WebSocketMessage::Text(text) => {
-                handle_message(&text)?;
+                write.send(subscribe_msg).await?;
+
+                while let Some(message) = read.next().await {
+                    match message {
+                        Ok(WebSocketMessage::Text(text)) => {
+                            let text_clone = text.clone();
+                            let trade_buffer = Arc::clone(&trade_buffer);
+                            let quote_buffer = Arc::clone(&quote_buffer);
+                            let ohlc_buffer = Arc::clone(&ohlc_buffer);
+                            tokio::spawn(async move {
+                                if let Err(e) = handle_message(
+                                    &text_clone,
+                                    &trade_buffer,
+                                    &quote_buffer,
+                                    &ohlc_buffer,
+                                ) {
+                                    eprintln!("Error handling message: {}", e);
+                                }
+                            });
+                        }
+                        Ok(WebSocketMessage::Binary(_)) => println!("Received binary data"),
+                        Ok(_) => (),
+                        Err(e) => {
+                            eprintln!("Error reading message: {}", e);
+                            break;
+                        }
+                    }
+                }
             }
-            WebSocketMessage::Binary(_) => println!("Received binary data"),
-            _ => (),
+            Err(e) => {
+                eprintln!("Error connecting to WebSocket: {}", e);
+            }
         }
-    }
 
-    Ok(())
+        // Wait before attempting to reconnect
+        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+    }
 }

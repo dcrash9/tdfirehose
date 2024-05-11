@@ -2,9 +2,36 @@
 use chrono::{DateTime, NaiveDate, TimeZone};
 use csv::WriterBuilder;
 use serde::Serialize;
-use std::fs::OpenOptions;
 use std::path::Path;
 use time::{Duration, Time};
+
+use std::fs::OpenOptions;
+use std::io::BufWriter;
+
+pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv::Error> {
+    // Check if the file already exists
+    let path = Path::new(file_path);
+    let file_exists = path.exists();
+    // Open or create the file
+    let file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(file_path)?;
+    // Create a buffered writer
+    let mut writer = BufWriter::new(file);
+    // Create a CSV writer with or without headers based on file existence
+    let mut csv_writer = if file_exists {
+        // Create a writer that does not write headers
+        WriterBuilder::new().has_headers(false).from_writer(&mut writer)
+    } else {
+        // Create a writer that writes headers
+        WriterBuilder::new().has_headers(true).from_writer(&mut writer)
+    };
+    // Serialize the record and write to the CSV file
+    csv_writer.serialize(record)?;
+    csv_writer.flush()?;
+    Ok(())
+}
 
 pub fn combine_date_time(
     date_int: i32,
@@ -34,30 +61,29 @@ pub fn combine_date_time(
         ))),
     }
 }
-
-pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv::Error> {
-    // Check if the file already exists
-    let path = Path::new(file_path);
-    let file_exists = path.exists();
-    // Open or create the file
-    let file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(file_path)?;
-    // let file = OpenOptions::new().write(true).create(true).append(true).open(file_path)?;
-    // Create a CSV writer with or without headers based on file existence
-    let mut writer = if file_exists {
-        // Create a writer that does not write headers
-        WriterBuilder::new().has_headers(false).from_writer(file)
-    } else {
-        // Create a writer that writes headers
-        WriterBuilder::new().has_headers(true).from_writer(file)
-    };
-    // Serialize the record and write to the CSV file
-    writer.serialize(record)?;
-    writer.flush()?;
-    Ok(())
-}
+// 
+// pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv::Error> {
+//     // Check if the file already exists
+//     let path = Path::new(file_path);
+//     let file_exists = path.exists();
+//     // Open or create the file
+//     let file = OpenOptions::new()
+//         .append(true)
+//         .create(true)
+//         .open(file_path)?;
+//     // Create a CSV writer with or without headers based on file existence
+//     let mut writer = if file_exists {
+//         // Create a writer that does not write headers
+//         WriterBuilder::new().has_headers(false).from_writer(file)
+//     } else {
+//         // Create a writer that writes headers
+//         WriterBuilder::new().has_headers(true).from_writer(file)
+//     };
+//     // Serialize the record and write to the CSV file
+//     writer.serialize(record)?;
+//     writer.flush()?;
+//     Ok(())
+// }
 
 pub fn to_occ_contract(
     root: &String,
@@ -76,66 +102,3 @@ pub fn to_occ_contract(
     );
     Ok(symbol)
 }
-
-// pub fn is_third_friday(date: i32) -> bool {
-//     let date_str = date.to_string();
-//     if date_str.len() != 8 {
-//         return false; // Return false if the date format is not valid
-//     }
-//
-//     // Parsing year, month, and day
-//     let year = &date_str[0..4].parse::<i32>().unwrap();
-//     let month = &date_str[4..6].parse::<u32>().unwrap();
-//     let day = &date_str[6..8].parse::<u32>().unwrap();
-//
-//     // Create a NaiveDate object
-//     match NaiveDate::from_ymd_opt(*year, *month, *day) {
-//         Some(date) => {
-//             // Check if it's a Friday
-//             if date.weekday() == Weekday::Fri {
-//                 // Check if it's the third Friday
-//                 let first_day_of_month = NaiveDate::from_ymd(*year, *month, 1);
-//                 let first_friday = match first_day_of_month.weekday() {
-//                     Weekday::Mon => first_day_of_month + chrono::Duration::days(4),
-//                     Weekday::Tue => first_day_of_month + chrono::Duration::days(3),
-//                     Weekday::Wed => first_day_of_month + chrono::Duration::days(2),
-//                     Weekday::Thu => first_day_of_month + chrono::Duration::days(1),
-//                     Weekday::Fri => first_day_of_month,
-//                     Weekday::Sat => first_day_of_month + chrono::Duration::days(6),
-//                     Weekday::Sun => first_day_of_month + chrono::Duration::days(5),
-//                 };
-//                 return date == first_friday + chrono::Duration::days(14);
-//             }
-//             false
-//         },
-//         None => false, // Invalid date
-//     }
-// }
-
-// pub fn is_third_friday(date: i32) -> bool {
-//     let date_str = date.to_string();
-//     if date_str.len() != 8 {
-//         return false; // Return false if the date format is not valid
-//     }
-//
-//     // Parsing year, month, and day
-//     let year = &date_str[0..4].parse::<i32>().unwrap();
-//     let month = &date_str[4..6].parse::<u32>().unwrap();
-//     let day = &date_str[6..8].parse::<u32>().unwrap();
-//
-//     // Create a NaiveDate object
-//     match NaiveDate::from_ymd_opt(*year, *month, *day) {
-//         Some(date) => {
-//             // Check if it's a Friday
-//             if date.weekday() == Weekday::Fri {
-//                 // Check if it's the third Friday
-//                 let first_day_of_month = NaiveDate::from_ymd(*year, *month, 1);
-//                 let first_friday = first_day_of_month
-//                     + chrono::Duration::days((11 - first_day_of_month.weekday().num_days_from_monday() as i64) % 7);
-//                 return date == first_friday + chrono::Duration::days(14);
-//             }
-//             false
-//         },
-//         None => false, // Invalid date
-//     }
-// }
