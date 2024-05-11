@@ -61,7 +61,6 @@ pub struct Trade {
     pub date: i32,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct QuoteData {
     pub timestamp: String,

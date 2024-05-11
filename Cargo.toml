@@ -20,7 +20,7 @@ lto = true     # Enables Link Time Optimization for further optimizations
 
 [dependencies]
 chrono = "*"
-clap = "*"
+clap = "3.2.25"
 config = "*"
 csv = "*"
 futures-util = "*"

@@ -5,10 +5,12 @@ ThetaData options data firehose client.
 <br>
 <br>
 </h1>
-A cross platform websockets client that saves trade, quote and ohlc options data in csv files.
+A cross platform websockets client that collects options trade, quote and ohlc transactions/messages and saves them locally.
+<hr>
+DISCLAIMER: This is a personal project and is not affiliated with ThetaData in any way. I am not a programmer and this is my first attempt at programming anything in Rust. This project is not intended for production use. It is a learning project and should be used for educational purposes only. 
 <hr>
 
-### To Use
+### Compile
 Simply run the following command on mac/windows/linux:
 
 ```
@@ -17,7 +19,18 @@ cd tdfirehose
 ```
 
 ```
-cargo build --release
+cargo build
+```
+the build will be in the `target/debug` folder.
+
+
+### Run
+```
+cargo run
+
+or
+
+./target/debug/tdfirehose
 ```
 
 
@@ -32,7 +45,7 @@ tdfirehose [OPTIONS]
 
 OPTIONS:
 -h, --help         Print help information
--u, --url <URL>
+-u, --url <URL>    Default: 'ws://127.0.0.1:25520/v1/events'
 -V, --version      Print version information
 ```
 
@@ -77,8 +90,11 @@ timestamp,root,dte,expiration,strike,right,symbol,open,high,low,close,volume,cou
 <hr>
 
 ### Roadmap
-- [x] map trade with quote and ohcl records.
-- [ ] save full trade record to parquet (duckdb, arctic, etc.)
+- [ ] use config file for wider configuration and server alternatives.
+- [ ] (E) map TRADE with QUOTE and OHLC records.
+- [ ] (T) normalize & clean data.
+- [ ] (T) realtime stats & analytics.
+- [ ] (L) save full trade record to parquet (duckdb, arctic, etc.)
 
 
 <hr>
