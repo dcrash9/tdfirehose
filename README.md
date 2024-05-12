@@ -91,10 +91,10 @@ timestamp,root,dte,expiration,strike,right,symbol,open,high,low,close,volume,cou
 
 ### Roadmap
 - [ ] use config file for wider configuration and server alternatives.
-- [ ] (E) map TRADE with QUOTE and OHLC records.
-- [ ] (T) normalize & clean data.
-- [ ] (T) realtime stats & analytics.
-- [ ] (L) save full trade record to parquet (duckdb, arctic, etc.)
+- [X] (Yes BUT Unoptimised) map TRADE with QUOTE and OHLC records.
+- [X] (Yes BUT Unoptimised) normalize & clean data.
+- [x] (Partial) realtime stats & analytics.
+- [ ] save full trade record to parquet (duckdb, arctic, etc.)
 
 
 <hr>
