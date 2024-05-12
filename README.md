@@ -12,7 +12,7 @@ DISCLAIMER: This is a personal project and is not affiliated with ThetaData in a
 
 ### Features:
 1. now when it runs, it shows real time stats like this:
-```
+```bash
 ❯ ./target/release/playground
 Connected to: ws://127.0.0.1:25520/v1/events
 Received messages: 101718 [~ 959.60 / sec. ≡ ~ 101718.00 / min.] [~ delay: 2.80 sec.]
@@ -27,12 +27,12 @@ Received messages: 101718 [~ 959.60 / sec. ≡ ~ 101718.00 / min.] [~ delay: 2.8
 ### Compile
 Simply run the following command on mac/windows/linux:
 
-```
+```bash
 git clone https://github.com/dcrash9/tdfirehose.git
 cd tdfirehose
 ```
 
-```
+```bash
 cargo build
 ```
 the build will be in the `target/debug` folder.
@@ -49,23 +49,18 @@ or
 
 
 Command line options:
-```
-❯ ./tdfirehose -h
-tdfirehose 0.1.0
+```bash
+tdfirehose 0.1.3
 A cross platform options data client.
 
 USAGE:
-tdfirehose [OPTIONS]
+    tdfirehose [OPTIONS]
 
 OPTIONS:
--h, --help         Print help information
--u, --url <URL>    Default: 'ws://127.0.0.1:25520/v1/events'
--V, --version      Print version information
-```
-
-the default url is `ws://127.0.0.1:25520/v1/events`. you can change it at start like this:
-```
-./tdfirehose -u ws://10.0.0.5:8080/v1/events
+    -d, --debug <debug>
+    -h, --help             Print help information
+    -u, --url <URL>        [default: ws://127.0.0.1:25520/v1/events]
+    -V, --version          Print version information
 ```
 
 ### Exit
@@ -77,8 +72,17 @@ To exit just press `Ctrl + C`
 
 ### The saved files are in the following format:
 
-agg.csv
+log.csv
+```csv
+timestamp,msg_count,avg_msg_per_sec,avg_msg_per_min,avg_delay
+2024-05-12 04:11:07.619488 EDT,197907,1105.63,98953.50,1019761.07
+2024-05-12 04:12:07.623361 EDT,268944,1125.29,89648.00,1019768.96
+2024-05-12 04:13:07.629234 EDT,334613,1119.11,83653.25,1019775.74
 ```
+
+
+agg.csv
+```csv
 timestamp,root,dte,expiration,strike,right,symbol,size,price,exchange,sequence,condition,bid_condition,bid_exchange,bid_size,bid,ask,ask_size,ask_exchange,ask_condition,open,high,low,close,volume,count,ms_of_day,date
 2024-04-30 13:39:27.469,SPY,0,20240430,506000,C,SPY240430C00506000,4,0.98,11,2104120248,18,50,69,57,0.98,0.99,314,7,50,2.97,3.9,0.69,0.98,136701,12570,49167469,20240430
 2024-04-30 13:43:35.881,TGT,3,20240503,157500,P,TGT240503P00157500,1,0.47,9,322306155,125,50,1,1,0.47,0.5,121,5,50,0.32,0.6,0.32,0.47,279,101,49415881,20240430
@@ -87,7 +91,7 @@ timestamp,root,dte,expiration,strike,right,symbol,size,price,exchange,sequence,c
 
 
 trade.csv
-```
+```csv
 timestamp,root,dte,expiration,strike,right,symbol,size,price,exchange,sequence,condition,ms_of_day,date
 2024-04-30 11:27:01.290,SPY,2,20240502,508000,C,SPY240502C00508000,1,2.72,6,1892502965,125,41221290,20240430
 2024-04-30 11:27:01.301,BLK,17,20240517,800000,C,BLK240517C00800000,3,2.05,43,-170898468,131,41221301,20240430
@@ -95,7 +99,7 @@ timestamp,root,dte,expiration,strike,right,symbol,size,price,exchange,sequence,c
 ```
 
 quote.csv
-```
+```csv
 timestamp,root,dte,expiration,strike,right,symbol,bid_condition,bid_exchange,bid_size,bid,ask,ask_size,ask_exchange,ask_condition,ms_of_day,date
 2024-04-30 11:26:47.731,SPY,2,20240502,508000,C,SPY240502C00508000,50,65,6,2.73,2.74,45,1,50,41207731,20240430
 2024-04-30 11:27:01.286,SPXW,0,20240430,5035000,P,SPXW240430P05035000,50,5,350,0.55,0.6,191,5,50,41221286,20240430
@@ -103,7 +107,7 @@ timestamp,root,dte,expiration,strike,right,symbol,bid_condition,bid_exchange,bid
 ```
 
 ohlc.csv
-```
+```csv
 timestamp,root,dte,expiration,strike,right,symbol,open,high,low,close,volume,count,ms_of_day,date
 2024-04-30 11:27:01.290,SPY,2,20240502,508000,C,SPY240502C00508000,3.38,4.01,2.55,2.72,2577,390,41221290,20240430
 2024-04-30 11:27:01.301,BLK,17,20240517,800000,C,BLK240517C00800000,2.15,2.15,2.05,2.05,5,3,41221301,20240430
