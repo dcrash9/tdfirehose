@@ -10,6 +10,21 @@ A cross platform websockets client that collects options trade, quote and ohlc t
 DISCLAIMER: This is a personal project and is not affiliated with ThetaData in any way. I am not a programmer and this is my first attempt at programming anything in Rust. This project is not intended for production use. It is a learning project and should be used for educational purposes only. 
 <hr>
 
+### Features:
+
+now when it runs, it shows real time stats like this:
+```
+❯ ./target/release/playground
+Connected to: ws://127.0.0.1:25520/v1/events
+Received messages: 101718 [~ 959.60 / sec. ≡ ~ 101718.00 / min.] [~ delay: 2.80 sec.]
+```
+!!! also, it maps trade with quote and ohlc records. the aggregate feed is saved in agg.csv. !!!
+
+
+
+
+<hr>
+
 ### Compile
 Simply run the following command on mac/windows/linux:
 
