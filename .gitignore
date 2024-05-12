@@ -1,9 +1,11 @@
 /target
 /_backup
-/ohlc.csv
-/quote.csv
-/trade.csv
 /.idea
+ohlc.csv
+quote.csv
+trade.csv
+agg.csv
+log.csv
 tt-dev.sh
 tt-prod.sh
 

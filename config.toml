@@ -1,3 +1,12 @@
+[settings]
+BUFFER_SIZE = 100
+DEBUG = true
+LOGFILE = "log.csv"
+QUOTEFILE = "quote.csv"
+TRADEFILE = "trade.csv"
+OHLCFILE = "ohlc.csv"
+AGGFILE = "agg.csv"
+
 [prod]
 ws_url = "ws://10.0.0.5:8080/v1/events"
 

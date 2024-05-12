@@ -1,4 +1,3 @@
-// extern crate chrono;
 use chrono::{DateTime, NaiveDate, TimeZone};
 use csv::WriterBuilder;
 use serde::Serialize;
@@ -22,10 +21,14 @@ pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv:
     // Create a CSV writer with or without headers based on file existence
     let mut csv_writer = if file_exists {
         // Create a writer that does not write headers
-        WriterBuilder::new().has_headers(false).from_writer(&mut writer)
+        WriterBuilder::new()
+            .has_headers(false)
+            .from_writer(&mut writer)
     } else {
         // Create a writer that writes headers
-        WriterBuilder::new().has_headers(true).from_writer(&mut writer)
+        WriterBuilder::new()
+            .has_headers(true)
+            .from_writer(&mut writer)
     };
     // Serialize the record and write to the CSV file
     csv_writer.serialize(record)?;
@@ -34,8 +37,7 @@ pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv:
 }
 
 pub fn combine_date_time(
-    date_int: i32,
-    ms_of_day: u64,
+    date_int: i32, ms_of_day: u64,
 ) -> Result<DateTime<chrono::Utc>, Box<dyn std::error::Error>> {
     let date_str = date_int.to_string();
     // Parse the date
@@ -61,35 +63,9 @@ pub fn combine_date_time(
         ))),
     }
 }
-// 
-// pub fn write_to_csv<T: Serialize>(file_path: &str, record: T) -> Result<(), csv::Error> {
-//     // Check if the file already exists
-//     let path = Path::new(file_path);
-//     let file_exists = path.exists();
-//     // Open or create the file
-//     let file = OpenOptions::new()
-//         .append(true)
-//         .create(true)
-//         .open(file_path)?;
-//     // Create a CSV writer with or without headers based on file existence
-//     let mut writer = if file_exists {
-//         // Create a writer that does not write headers
-//         WriterBuilder::new().has_headers(false).from_writer(file)
-//     } else {
-//         // Create a writer that writes headers
-//         WriterBuilder::new().has_headers(true).from_writer(file)
-//     };
-//     // Serialize the record and write to the CSV file
-//     writer.serialize(record)?;
-//     writer.flush()?;
-//     Ok(())
-// }
 
 pub fn to_occ_contract(
-    root: &String,
-    expiration: i32,
-    right: &String,
-    strike: i64,
+    root: &String, expiration: i32, right: &String, strike: i64,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let occ_strike = format!("{:08}", strike);
     let exp_date = NaiveDate::parse_from_str(&expiration.to_string(), "%Y%m%d")?;
