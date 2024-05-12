@@ -11,16 +11,15 @@ DISCLAIMER: This is a personal project and is not affiliated with ThetaData in a
 <hr>
 
 ### Features:
-
-now when it runs, it shows real time stats like this:
+1. now when it runs, it shows real time stats like this:
 ```
 ❯ ./target/release/playground
 Connected to: ws://127.0.0.1:25520/v1/events
 Received messages: 101718 [~ 959.60 / sec. ≡ ~ 101718.00 / min.] [~ delay: 2.80 sec.]
 ```
-!!! also, it maps trade with quote and ohlc records. the aggregate feed is saved in agg.csv. !!!
+2. the application maps trade with quote and ohlc records. the aggregate feed is saved in agg.csv.
 
-
+3. a log is created which saves every minute a snapshot of the stats.
 
 
 <hr>
@@ -77,6 +76,15 @@ To exit just press `Ctrl + C`
 <hr>
 
 ### The saved files are in the following format:
+
+agg.csv
+```
+timestamp,root,dte,expiration,strike,right,symbol,size,price,exchange,sequence,condition,bid_condition,bid_exchange,bid_size,bid,ask,ask_size,ask_exchange,ask_condition,open,high,low,close,volume,count,ms_of_day,date
+2024-04-30 13:39:27.469,SPY,0,20240430,506000,C,SPY240430C00506000,4,0.98,11,2104120248,18,50,69,57,0.98,0.99,314,7,50,2.97,3.9,0.69,0.98,136701,12570,49167469,20240430
+2024-04-30 13:43:35.881,TGT,3,20240503,157500,P,TGT240503P00157500,1,0.47,9,322306155,125,50,1,1,0.47,0.5,121,5,50,0.32,0.6,0.32,0.47,279,101,49415881,20240430
+2024-04-30 13:43:35.925,AMZN,143,20240920,135000,P,AMZN240920P00135000,1,1.74,7,323080836,18,50,1,1,1.74,1.77,8,47,50,1.7,1.76,1.7,1.74,17,11,49415925,20240430
+```
+
 
 trade.csv
 ```
